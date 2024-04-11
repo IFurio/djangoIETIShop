@@ -4,7 +4,11 @@ from .models import *
 # Create your views here.
 def product_list(request):
     productes = Producte.objects.all()
-    return render(request, "product_list.html", {"productes":productes})
+    categories = Categoria.objects.all()
+    return render(request, "product_list.html", {
+            "productes":productes, 
+            "categories": categories
+        })
 
 def category_list(request):
     categories = Categoria.objects.all()

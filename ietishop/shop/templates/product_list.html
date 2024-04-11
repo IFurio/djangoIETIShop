@@ -1,16 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Llista de Productes</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        
+    </style>
 </head>
 <body>
-    <h1>LListat de Productes</h1>
+    <h1>Llistat de Productes</h1>
+    <select>
+        <option selected>Selecciona una categoria...</option>
+        {% for categoria in categories %}
+        <option value="{{categoria.id}}">{{categoria.nom}}</option>
+        {% endfor %}
+    </select>
+
     <ul>
-    {% for producte in productes %}
-        <li>{{producte.nom}}</li>
-    {% endfor %}
+        
     </ul>
+
+    <div class="product-grid">
+        {% for producte in productes %}
+        <ul>
+            <li>{{producte.nom}}</li>
+            <li>{{producte.descripcio}}</li>
+            <li>{{producte.preu}}</li>
+            <li>{{producte.categoria}}</li>
+            <li>Cantidad en stock: {{producte.quantitat_disponible}}</li>
+        </ul>
+        {% endfor %}
+    </div>
+
+    <script>
+        function displayProds(res) {
+            const productes = res.productes
+            $('ul').empty()
+            productes.forEach(producte => {
+                $('ul').append(
+                    `<li>${producte.nom}</li>`
+                )
+            })
+        }
+
+        $('select').on('change', function() {
+            var id = $(this).val()
+
+            $.ajax({
+                url: '/shop/api/prods/'+id,
+                method: 'GET',
+                success: displayProds,
+                error: () => console.error('No se pudo')
+            })
+        })
+    </script>
 </body>
 </html>
