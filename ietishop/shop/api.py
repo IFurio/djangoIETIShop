@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from .models import *
+from django.core.paginator import Paginator
 
 def getProducts(request):
     jsonData = list( Producte.objects.all().values() )

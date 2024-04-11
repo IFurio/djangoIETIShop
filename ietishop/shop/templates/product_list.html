@@ -6,7 +6,20 @@
     <title>Llista de Productes</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <style>
-        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Esto crea 3 columnas de igual ancho */
+            gap: 50px; /* Espacio entre las columnas */
+        }
+
+        .product-grid ul {
+            background-color: #f2f2f2;
+            padding: 20px;
+            text-align: center;
+            list-style: none;
+            border-radius: 50px;
+            height: 400px;
+        }
     </style>
 </head>
 <body>
@@ -25,36 +38,61 @@
     <div class="product-grid">
         {% for producte in productes %}
         <ul>
-            <li>{{producte.nom}}</li>
+            <li><h1>{{producte.nom}}</h1></li>
             <li>{{producte.descripcio}}</li>
-            <li>{{producte.preu}}</li>
+            <li><h2>{{producte.preu}} €</h2></li>
             <li>{{producte.categoria}}</li>
             <li>Cantidad en stock: {{producte.quantitat_disponible}}</li>
+            <li><button>Possar a la cistella</button></li>
         </ul>
         {% endfor %}
     </div>
 
     <script>
-        function displayProds(res) {
-            const productes = res.productes
-            $('ul').empty()
-            productes.forEach(producte => {
-                $('ul').append(
-                    `<li>${producte.nom}</li>`
-                )
+        var productSet = 1;
+        $(function () {
+            $('select').on('change', function() {
+                var id = $(this).val()
+
+                $.ajax({
+                    url: '/shop/api/prods/'+id,
+                    method: 'GET',
+                    success: displayProds,
+                    error: () => console.error('No se pudo')
+                })
             })
+
+            // Detectar el evento de scroll
+            $(window).scroll(function() {
+                // Verificar si el usuario ha llegado al final de la página
+                if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+                    // Si el usuario ha llegado al final de la página, cargar más productos
+                    getProducts();
+                }
+            });
+        })
+
+        function getProducts() {
+
         }
 
-        $('select').on('change', function() {
-            var id = $(this).val()
 
-            $.ajax({
-                url: '/shop/api/prods/'+id,
-                method: 'GET',
-                success: displayProds,
-                error: () => console.error('No se pudo')
+        function displayProds(res) {
+            const productes = res.productes
+            $('.product-grid').empty()
+            productes.forEach(producte => {
+                const ulElement = $('<ul></ul>'); // Crear un nuevo elemento ul
+                ulElement.append(
+                    $('<li></li>').append($('<h1></h1>').text(producte.nom)),
+                    $('<li></li>').text(producte.descripcio),
+                    $('<li></li>').append($('<h2></h2>').text(producte.preu + " €")),
+                    $('<li></li>').text(producte.categoria),
+                    $('<li></li>').text(`Cantidad en stock: ${producte.quantitat_disponible}`),
+                    $('<li></li>').append($('<button></button>').text('Possar a la cistella'))
+                );
+                $('.product-grid').append(ulElement);
             })
-        })
+        }
     </script>
 </body>
 </html>
